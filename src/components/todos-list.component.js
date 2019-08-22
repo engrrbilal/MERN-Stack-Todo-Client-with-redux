@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import * as todos from '../apis/todos'
 
 const Todo = props => (
     <tr>
@@ -21,23 +21,15 @@ export default class TodosList extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:4000/api/todos')
-            .then(response => {
-                this.setState({todos: response.data});
-            })
-            .catch(function (error) {
-                console.log("error while getting todos",error);
-            })
+        todos.getAll().then(data=> {
+            this.setState({todos: data});
+        })
     }
 
     componentDidUpdate() {
-        axios.get('http://localhost:4000/api/todos')
-        .then(response => {
-            this.setState({todos: response.data});
-        })
-        .catch(function (error) {
-            console.log(error);
-        })   
+        todos.getAll().then(data=> {
+            this.setState({todos: data});
+        })  
     }
 
     todoList() {
