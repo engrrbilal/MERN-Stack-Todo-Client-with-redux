@@ -15,4 +15,17 @@ code {
 
 .completed {
   text-decoration: line-through;
+  color:red;
+}
+.defaultTextStyle{
+  padding:16px;
+}
+.marginHorizontal{
+  margin:0px 16px;
+}
+.textLimit{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
 }

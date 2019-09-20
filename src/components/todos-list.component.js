@@ -1,19 +1,21 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
-import * as todos from '../apis/todos'
+// import * as todos from '../apis/todos'
+import { connect } from 'react-redux';
+import { getAllTodos} from '../actions/dataActions';
 
 const Todo = props => (
     <tr>
-        <td className={props.todo.todo_completed ? 'completed' : ''}>{props.todo.todo_description}</td>
-        <td className={props.todo.todo_completed ? 'completed' : ''}>{props.todo.todo_responsible}</td>
+        <td className={props.todo.todo_completed ? 'completed textLimit' : 'textLimit'}>{props.todo.todo_description}</td>
+        <td className={props.todo.todo_completed ? 'completed textLimit' : 'textLimit'}>{props.todo.todo_responsible}</td>
         <td className={props.todo.todo_completed ? 'completed' : ''}>{props.todo.todo_priority}</td>
         <td>
-            <Link to={"/edit/"+props.todo._id}>Edit</Link>
+            <Link to={"/edit/"+props.todo._id} >Edit</Link>
         </td>
     </tr>
 )
 
-export default class TodosList extends Component {
+class TodosList extends Component {
 
     constructor(props) {
         super(props);
@@ -21,19 +23,27 @@ export default class TodosList extends Component {
     }
 
     componentDidMount() {
-        todos.getAll().then(data=> {
-            this.setState({todos: data});
-        })
+        this.props.getAllTodos().then(data=> {
+            this.setState({todos: data.todos});
+        })  
+        // this.props.getAllTodos().then(data=> {
+        //     console.log("data: ",data);
+        //     this.setState({todos: data.todos});
+        // })
+        // todos.getAll().then(data=> {
+        //     this.setState({todos: data});
+        // })
     }
 
-    componentDidUpdate() {
-        todos.getAll().then(data=> {
-            this.setState({todos: data});
-        })  
-    }
+    // componentDidUpdate() {
+    //     this.props.getAllTodos().then(data=> {
+    //         this.setState({todos: data.todos});
+    //     })  
+    // }
 
     todoList() {
-        return this.state.todos.map(function(currentTodo, i) {
+        return this.state.todos.map((currentTodo, i) => {
+            console.log("todos: ",currentTodo)
             return <Todo todo={currentTodo} key={i} />;
         });
     }
@@ -52,10 +62,20 @@ export default class TodosList extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        { this.todoList() }
+                        { this.state.todos.length ? this.todoList(): <p className = "defaultTextStyle" >No todos added yet</p> }
                     </tbody>
                 </table>
             </div>
         )
     }
 }
+/* We can also get data of todos from reducer */
+// const mapStateToProps = (state) => {
+//     return{
+//         todos:state.dataReducer.todos
+//     }   
+// }
+const mapDispatchToProps = (dispatch) =>({
+    getAllTodos: () => dispatch(getAllTodos())
+})
+export default connect(undefined, mapDispatchToProps)(TodosList)

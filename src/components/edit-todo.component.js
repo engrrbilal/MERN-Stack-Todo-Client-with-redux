@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import axios from 'axios';
-
-export default class EditTodo extends Component {
+import { connect } from 'react-redux';
+import { getTodoWithId,updateTodo,deleteTodoWithId} from '../actions/dataActions';
+class EditTodo extends Component {
 
     constructor(props) {
         super(props);
@@ -21,17 +21,19 @@ export default class EditTodo extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:4000/todos/'+this.props.match.params.id)
+        /* match.params.id is using from react-router-v4 matching id in url */
+        this.props.getTodoWithId(this.props.match.params.id)
             .then(response => {
+                console.log("response: ",response);
                 this.setState({
-                    todo_description: response.data.todo_description,
-                    todo_responsible: response.data.todo_responsible,
-                    todo_priority: response.data.todo_priority,
-                    todo_completed: response.data.todo_completed
+                    todo_description: response.todo.todo_description,
+                    todo_responsible: response.todo.todo_responsible,
+                    todo_priority: response.todo.todo_priority,
+                    todo_completed: response.todo.todo_completed
                 })
             })
-            .catch(function(error) {
-                console.log(error)
+            .catch((error) =>{
+                console.log("error while getting todo: ",error)
             })
     }
 
@@ -58,19 +60,37 @@ export default class EditTodo extends Component {
             todo_completed: !this.state.todo_completed
         });
     }
+    deleteTodo(){
+        this.props.deleteTodoWithId(this.props.match.params.id)
+        .then(res => {
+            console.log(res.data);
+            if(res){
+                alert("Todo has been deleted successfully!")
+                this.props.history.push('/')
+            } else {
+                alert("Server error while deleting todo");
+            }
+        });
+    }
 
     onSubmit(e) {
         e.preventDefault();
-        const obj = {
+        const todoToUpdate = {
             todo_description: this.state.todo_description,
             todo_responsible: this.state.todo_responsible,
             todo_priority: this.state.todo_priority,
             todo_completed: this.state.todo_completed
         };
-        axios.post('http://localhost:4000/api/todos'+this.props.match.params.id, obj)
-            .then(res => console.log(res.data));
-
-        this.props.history.push('/');
+        this.props.updateTodo(this.props.match.params.id,todoToUpdate)
+        .then(res => {
+            console.log(res.data);
+            if(res){
+                alert("Todo has been updated successfully!")
+                this.props.history.push('/')
+            } else {
+                alert("Server error while updating todo");
+            }
+        });
     }
 
     render() {
@@ -100,8 +120,8 @@ export default class EditTodo extends Component {
                                     type="radio"
                                     name="priorityOptions"
                                     id="priorityLow"
-                                    value="Low"
-                                    checked={this.state.todo_priority==='Low'}
+                                    value="low"
+                                    checked={this.state.todo_priority==='low'}
                                     onChange={this.onChangeTodoPriority}
                                     />
                             <label className="form-check-label">Low</label>
@@ -111,8 +131,8 @@ export default class EditTodo extends Component {
                                     type="radio"
                                     name="priorityOptions"
                                     id="priorityMedium"
-                                    value="Medium"
-                                    checked={this.state.todo_priority==='Medium'}
+                                    value="medium"
+                                    checked={this.state.todo_priority==='medium'}
                                     onChange={this.onChangeTodoPriority}
                                     />
                             <label className="form-check-label">Medium</label>
@@ -122,8 +142,8 @@ export default class EditTodo extends Component {
                                     type="radio"
                                     name="priorityOptions"
                                     id="priorityHigh"
-                                    value="High"
-                                    checked={this.state.todo_priority==='High'}
+                                    value="high"
+                                    checked={this.state.todo_priority==='high'}
                                     onChange={this.onChangeTodoPriority}
                                     />
                             <label className="form-check-label">High</label>
@@ -144,6 +164,7 @@ export default class EditTodo extends Component {
                         <br/>
                         <div className="form-group">
                             <input type="submit" value="Update Todo" className="btn btn-primary" />
+                            <input type="button" onClick={this.deleteTodo.bind(this)} value="Delete Todo" className="btn btn-danger marginHorizontal" />
                         </div>
                     </div>
                 </form>
@@ -151,3 +172,15 @@ export default class EditTodo extends Component {
         )
     }
 }
+
+// const mapStateToProps = (state) => {
+//     return{
+//         todos:state.dataReducer.todos
+//     }   
+// }
+const mapDispatchToProps = (dispatch) =>({
+    updateTodo: (id,todoToUpdate) => dispatch(updateTodo(id,todoToUpdate)),
+    getTodoWithId: (id) => dispatch(getTodoWithId(id)),
+    deleteTodoWithId: (id) => dispatch(deleteTodoWithId(id))
+})
+export default connect(undefined, mapDispatchToProps)(EditTodo)

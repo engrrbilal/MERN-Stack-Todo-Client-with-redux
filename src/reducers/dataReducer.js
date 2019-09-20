@@ -1,5 +1,6 @@
-var dataReducerDefaultState = {
+let dataReducerDefaultState = {
     todos:[1],
+    todo:[]
 }
 
 export default (state=dataReducerDefaultState,action)=>{
@@ -8,18 +9,28 @@ export default (state=dataReducerDefaultState,action)=>{
             return({
                 ...state,
                 // todos:todos.concat(action.data)
-                todos:state.todos.concat(action.data)
+                todos:state.todos.concat(action.todo)
 
             })
-            case 'GET-TODOS':
+            case 'GET-ALL-TODOS':
             return({
                 ...state,
-                todos:action.todo
+                todos:action.todos
+            })
+            case 'GET-TODO-WITH-ID':
+            return({
+                ...state,
+                todos:action.todos
             })
             case 'UPDATE-TODO':
             return({
                 ...state,
-                todos:action.todo
+                todo:action.todo
+            })
+            case 'DELETE-TODO-WITH-ID':
+            return({
+                ...state,
+                todo:action.todo
             })
             default:
             return state;    

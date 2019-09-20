@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import * as todos from '../apis/todos'
-
-export default class CreateTodo extends Component {
+import { connect } from 'react-redux';
+import { addTodo} from '../actions/dataActions';
+class CreateTodo extends Component {
 
     constructor(props) {
         super(props);
@@ -52,7 +53,7 @@ export default class CreateTodo extends Component {
             todo_priority: this.state.todo_priority,
             todo_completed: this.state.todo_completed
         }
-        todos.add(newTodo).then(res=> {
+        this.props.addTodo(newTodo).then(res=> {
             console.log("res: ",res);
             this.setState({
                 todo_description: '',
@@ -60,7 +61,11 @@ export default class CreateTodo extends Component {
                 todo_priority: '',
                 todo_completed: false
             })
-            this.props.history.push('/');
+            if(res){
+                alert("Todo has been added successfully!");
+            } else {
+                alert("Server error while adding todo");
+            }
         })
     }
 
@@ -128,3 +133,13 @@ export default class CreateTodo extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return{
+        todos:state.dataReducer.todos
+    }   
+  }
+const mapDispatchToProps = (dispatch) =>({
+    addTodo: (newTodo) => dispatch(addTodo(newTodo))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(CreateTodo)
